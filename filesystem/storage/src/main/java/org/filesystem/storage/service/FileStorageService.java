@@ -13,8 +13,14 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Component
 @Slf4j
@@ -46,5 +52,19 @@ public class FileStorageService {
         } catch (IOException e) {
             log.info("File {} does not exist, moving on", filePath);
         }
+    }
+
+    public Set<String> getFiles() throws IOException {
+        final String dirPath = fileUtil.getDirectoryPath();
+        Set<String> fileList = new HashSet<>();
+        try (DirectoryStream<Path> stream = Files.newDirectoryStream(Paths.get(dirPath))) {
+            for (Path path : stream) {
+                if (!Files.isDirectory(path)) {
+                    fileList.add(path.getFileName()
+                            .toString());
+                }
+            }
+        }
+        return fileList;
     }
 }

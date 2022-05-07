@@ -9,8 +9,14 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.websocket.server.PathParam;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
-@RestController("/file-chunk")
+@RestController
+@RequestMapping("/file-chunk")
 @Slf4j
 public class FileChunkController {
 
@@ -36,5 +42,17 @@ public class FileChunkController {
 
         fileIOOrchestrator.deleteFile(fileName, fileChunkRequest);
         return new ResponseEntity<>("Uploaded File Successfully", HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping
+    public ResponseEntity<Object> getFiles() throws IOException {
+        Set<String> result = fileIOOrchestrator.getFiles();
+        Map<String, String> map = new HashMap<String, String>();
+        int counter = 1;
+        for(String fileName: result){
+            map.put(""+counter,fileName);
+            counter++;
+        }
+        return new ResponseEntity<Object>(map, HttpStatus.ACCEPTED);
     }
 }

@@ -19,4 +19,7 @@ public class FileUtil {
         return uploadDirectory + "//" + fileId + SEPARATOR + chunkId + SEPARATOR + fileName;
     }
 
+    public String getDirectoryPath(){
+        return uploadDirectory;
+    }
 }
