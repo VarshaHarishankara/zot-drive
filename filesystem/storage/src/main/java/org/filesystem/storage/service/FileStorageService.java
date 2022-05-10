@@ -19,13 +19,14 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 
 @Component
 @Slf4j
 public class FileStorageService {
     private final FileUtil fileUtil;
+    private Path foundFile;
 
     public FileStorageService(FileUtil fileUtil) {
         this.fileUtil = fileUtil;
@@ -66,5 +67,22 @@ public class FileStorageService {
             }
         }
         return fileList;
+    }
+
+    public Resource getFileAsResource(String fileName) throws IOException {
+        Path dirPath = Paths.get(fileUtil.getDirectoryPath());
+
+        Files.list(dirPath).forEach(file -> {
+            if (file.getFileName().toString().equals(fileName)) {
+                foundFile = file;
+                return;
+            }
+        });
+
+        if (foundFile != null) {
+            return new UrlResource(foundFile.toUri());
+        }
+
+        return null;
     }
 }

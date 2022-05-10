@@ -6,6 +6,7 @@ import org.filesystem.storage.notification.FileUploadNotificationService;
 import org.filesystem.storage.validator.FileValidator;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
 
 import java.io.IOException;
 import java.util.Set;
@@ -38,6 +39,10 @@ public class FileIOOrchestrator {
 
     public Set<String> getFiles() throws IOException {
         return fileStorageService.getFiles();
+    }
+
+    public Resource getFileAsResource(String fileName) throws IOException{
+        return  fileStorageService.getFileAsResource(fileName);
     }
 
 }

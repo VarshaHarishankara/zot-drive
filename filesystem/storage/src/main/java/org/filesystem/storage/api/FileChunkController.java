@@ -7,9 +7,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.core.io.Resource;
+import org.springframework.http.MediaType;
+import org.springframework.http.HttpHeaders;
 
 import javax.websocket.server.PathParam;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,5 +58,27 @@ public class FileChunkController {
             counter++;
         }
         return new ResponseEntity<Object>(map, HttpStatus.ACCEPTED);
+    }
+
+    @GetMapping("/downloadFile/{fileName}")
+    public ResponseEntity<?> downloadFile(@PathVariable("fileName") String fileName) {
+        Resource resource;
+
+        try {
+            resource = fileIOOrchestrator.getFileAsResource(fileName);
+        } catch (IOException e) {
+            return ResponseEntity.internalServerError().build();
+        }
+
+        if (resource == null) {
+            return new ResponseEntity<>("File not found", HttpStatus.NOT_FOUND);
+        }
+
+        String contentType = "application/octet-stream";
+        String headerValue = "attachment; filename=\"" + resource.getFilename() + "\"";
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, headerValue)
+                .body(resource);
     }
 }
